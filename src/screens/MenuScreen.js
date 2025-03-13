@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, Image, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import api from '../services/api';
@@ -32,6 +32,12 @@ const MenuScreen = ({ route, navigation }) => {
         data={menu}
         renderItem={({ item }) => (
           <View style={styles.item}>
+            {item.image && (
+              <Image
+                source={{ uri: `http://localhost:3000${item.image}` }}
+                style={styles.image}
+              />
+            )}
             <Text>{item.name} - ${item.price}</Text>
             <Button mode="contained" onPress={() => addToCart(item)}>
               Add to Cart
@@ -46,7 +52,8 @@ const MenuScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  item: { flexDirection: 'row', justifyContent: 'space-between', padding: 8, borderBottomWidth: 1 },
+  item: { flexDirection: 'row', alignItems: 'center', padding: 8, borderBottomWidth: 1 },
+  image: { width: 50, height: 50, marginRight: 8 },
 });
 
 export default MenuScreen;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,9 +11,11 @@ import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import MenuScreen from './src/screens/MenuScreen';
 import { Provider as PaperProvider } from 'react-native-paper';
+import io from 'socket.io-client';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const socket = io('http://localhost:3000');
 
 function MainTabs() {
   return (
@@ -27,6 +29,11 @@ function MainTabs() {
 }
 
 export default function App() {
+  useEffect(() => {
+    socket.on('connect', () => console.log('Connected to socket'));
+    return () => socket.disconnect();
+  }, []);
+
   return (
     <Provider store={store}>
       <PaperProvider>
