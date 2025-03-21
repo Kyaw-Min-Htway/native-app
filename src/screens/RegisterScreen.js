@@ -4,23 +4,31 @@ import { TextInput, Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      await api.post('/auth/register', { email, password, name });
+      const response = await api.post('/auth/login', { email, password }); // Auto-login
       await AsyncStorage.setItem('token', response.data.token);
-      navigation.navigate('Main'); // 'Home' အစား 'Main' ကို သုံးထားတာ သတိပြုပါ
+      navigation.navigate('Home');
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Invalid credentials');
+      console.error('Registration failed:', error);
+      alert(error.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
     <View style={styles.container}>
+      <TextInput
+        label="Name (Optional)"
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
+      />
       <TextInput
         label="Email"
         value={email}
@@ -34,15 +42,15 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
         style={styles.input}
       />
-      <Button mode="contained" onPress={handleLogin} style={styles.button}>
-        Login
+      <Button mode="contained" onPress={handleRegister} style={styles.button}>
+        Register
       </Button>
       <Button
         mode="text"
-        onPress={() => navigation.navigate('Register')}
+        onPress={() => navigation.navigate('Login')}
         style={styles.button}
       >
-        Don't have an account? Register
+        Already have an account? Login
       </Button>
     </View>
   );
@@ -54,4 +62,4 @@ const styles = StyleSheet.create({
   button: { marginTop: 8 },
 });
 
-export default LoginScreen;
+export default RegisterScreen;

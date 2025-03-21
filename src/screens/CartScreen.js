@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useStripe } from '@stripe/stripe-react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 
 const CartScreen = ({ navigation }) => {
   const cartItems = useSelector(state => state.cart.items);
@@ -24,10 +25,17 @@ const CartScreen = ({ navigation }) => {
       const { error } = await presentPaymentSheet();
 
       if (!error) {
-        await api.post('/orders', { items: cartItems }, {
+        const orderResponse = await api.post('/orders', { items: cartItems }, {
           headers: { Authorization: `Bearer ${token}` },
         });
         dispatch({ type: 'CLEAR_CART' });
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Order Placed!',
+            body: `Your order #${orderResponse.data._id} has been successfully placed.`,
+          },
+          trigger: null, // Immediate
+        });
         navigation.navigate('OrderHistory');
       } else {
         alert('Payment failed: ' + error.message);
